@@ -17,3 +17,5 @@ __pycache__/
 
 # paper
 *.pdf
+report.pdf
+report.html
