@@ -6,6 +6,7 @@ from PIL import Image
 from torch.utils.data import DataLoader
 
 from ktrws.data import LineDataset, collate
+from ktrws.ground import draw, ground
 from ktrws.infer import load, recognize
 from ktrws.model import KTRWS
 from ktrws.tokenizer import ZWSP, Vocab, insert_boundaries, kcc_split
@@ -98,6 +99,20 @@ def test_infer_roundtrip(tmp_path):
   Image.new("RGB", (240, 32), (255, 255, 255)).save(img)
   assert len(recognize(loaded, loaded_vocab, [img, img])) == 2
   assert ZWSP not in recognize(loaded, loaded_vocab, [img], boundaries=False)[0]
+
+
+def test_grounding(tmp_path):
+  vocab = Vocab.from_corpus(TEXTS)
+  config = {"d": 64, "layers": 1, "heads": 2, "ffn": 128}
+  model = KTRWS(len(vocab), **config)
+  torch.save({"model": model.state_dict(), "vocab": vocab.itos, "config": config}, tmp_path / "w.pt")
+  loaded, loaded_vocab = load(tmp_path / "w.pt")
+
+  img_path = tmp_path / "line.png"
+  Image.new("RGB", (240, 32), (255, 255, 255)).save(img_path)
+  img, xs, text = ground(loaded, loaded_vocab, img_path)
+  assert all(0 <= x < img.width for x in xs)
+  assert draw(img, xs).size == (img.width * 3, img.height * 3)
 
 
 def test_dataset_and_train(tmp_path):
