@@ -6,6 +6,7 @@ from PIL import Image
 from torch.utils.data import DataLoader
 
 from ktrws.data import LineDataset, collate
+from ktrws.infer import load, recognize
 from ktrws.model import KTRWS
 from ktrws.tokenizer import ZWSP, Vocab, insert_boundaries, kcc_split
 from ktrws.metrics import boundary_positions, cer, f1, seg_counts
@@ -82,6 +83,21 @@ def make_dataset(root, vocab, n=4):
   (root / "labels.jsonl").write_text(
     "\n".join(json.dumps(r, ensure_ascii=False) for r in rows), encoding="utf-8"
   )
+
+
+def test_infer_roundtrip(tmp_path):
+  vocab = Vocab.from_corpus(TEXTS)
+  config = {"d": 64, "layers": 1, "heads": 2, "ffn": 128}
+  model = KTRWS(len(vocab), **config)
+  torch.save({"model": model.state_dict(), "vocab": vocab.itos, "config": config}, tmp_path / "w.pt")
+
+  loaded, loaded_vocab = load(tmp_path / "w.pt")
+  assert list(loaded_vocab.itos) == list(vocab.itos)
+
+  img = tmp_path / "line.png"
+  Image.new("RGB", (240, 32), (255, 255, 255)).save(img)
+  assert len(recognize(loaded, loaded_vocab, [img, img])) == 2
+  assert ZWSP not in recognize(loaded, loaded_vocab, [img], boundaries=False)[0]
 
 
 def test_dataset_and_train(tmp_path):

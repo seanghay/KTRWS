@@ -29,28 +29,19 @@ Trained 5 epochs on 16k synthetic textlines. On 2,000 held-out lines: **4.05% CE
 curl -LO https://github.com/seanghay/KTRWS/releases/download/v0.1.0/ktrws.pt
 ```
 
-The checkpoint carries its own vocabulary, so it loads on its own:
+Then run it — the checkpoint carries its own vocabulary and config:
 
-```python
-import torch
-from PIL import Image
-from ktrws.data import resize, to_tensor
-from ktrws.model import KTRWS
-from ktrws.tokenizer import Vocab
-
-ck = torch.load("ktrws.pt", map_location="cpu")
-vocab = Vocab(ck["vocab"])
-model = KTRWS(len(vocab))
-model.load_state_dict(ck["model"])
-model.eval()
-
-x = to_tensor(resize(Image.open("line.png").convert("RGB")))[None]
-with torch.no_grad():
-    ids = model(x, torch.tensor([1])).argmax(-1)[0]
-print(vocab.decode(ids.tolist()))   # words separated by U+200B
+```sh
+uv run python -m ktrws.infer line.png --sep "|"
+uv run python -m ktrws.infer line.png --plain      # b = 0, no boundaries
 ```
 
-Pass `torch.tensor([0])` to get plain text instead.
+```python
+from ktrws.infer import load, recognize
+
+model, vocab = load("ktrws.pt")
+print(recognize(model, vocab, ["line.png"])[0])   # words separated by U+200B
+```
 
 ## Usage
 

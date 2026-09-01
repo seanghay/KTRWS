@@ -55,7 +55,8 @@ def train(
     LineDataset(root / "dev", vocab), batch_size=batch_size, collate_fn=collate, num_workers=workers
   )
 
-  model = KTRWS(len(vocab), gating=gating).to(device)
+  config = {"gating": gating}
+  model = KTRWS(len(vocab), **config).to(device)
   opt = torch.optim.Adam(model.parameters(), lr=lr)
   sched = torch.optim.lr_scheduler.CyclicLR(
     opt, base_lr=lr / 10, max_lr=lr, step_size_up=max(1, len(train_loader) // 2), cycle_momentum=False
@@ -77,7 +78,7 @@ def train(
     dev_cer, dev_f1 = evaluate(model, vocab, dev_loader, device)
     print(f"dev CER {dev_cer:.4f} | seg F1 {dev_f1:.4f}")
     if out:
-      torch.save({"model": model.state_dict(), "vocab": vocab.itos}, out)
+      torch.save({"model": model.state_dict(), "vocab": vocab.itos, "config": config}, out)
   return model, vocab
 
 
