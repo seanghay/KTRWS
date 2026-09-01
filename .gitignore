@@ -1,0 +1,19 @@
+# dataset generation (local only)
+data/
+ktrws/corpus.py
+ktrws/generate.py
+ktrws/fonts.py
+ktrws/viz.py
+
+# checkpoints
+*.pt
+
+# python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# paper
+*.pdf
