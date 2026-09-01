@@ -29,3 +29,26 @@ uv run python -m ktrws.train --data data --epochs 5 --device cuda --workers 8
 
 Each image trains twice: plain text as the `b = 0` target, segmented as `b = 1`.
 On Apple Silicon, `--device mps` needs `PYTORCH_ENABLE_MPS_FALLBACK=1`.
+
+## Citation
+
+This is an independent implementation. Please cite the original paper:
+
+> Kong, M., Buoy, R., Chenda, S., Taing, N., Iwamura, M., Kise, K.
+> *Towards a Joint Khmer Text Recognition and Word Segmentation.*
+> arXiv:2608.30213, 2026.
+
+```bibtex
+@misc{kong2026ktrws,
+  title         = {Towards a Joint Khmer Text Recognition and Word Segmentation},
+  author        = {Kong, Marry and Buoy, Rina and Chenda, Sovisal and
+                   Taing, Nguonly and Iwamura, Masakazu and Kise, Koichi},
+  year          = {2026},
+  eprint        = {2608.30213},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.CV},
+  url           = {https://arxiv.org/abs/2608.30213}
+}
+```
+
+Word segmentation targets come from [khmercut](https://github.com/seanghay/khmercut).
