@@ -9,11 +9,11 @@ One CTC model reads Khmer text and, with `b = 1`, marks word boundaries with `U+
 ## Run
 
 ```sh
-curl -LO https://github.com/seanghay/KTRWS/releases/download/v0.1.0/ktrws.pt
+curl -LO https://github.com/seanghay/KTRWS/releases/download/v0.2.0/ktrws.pt
 uv run python -m ktrws.infer line.png --sep "|"
 ```
 
-4.05% CER and 77.5% segmentation F1 on 2,000 held-out lines.
+2.49% CER and 86.5% segmentation F1 on 2,000 held-out lines.
 
 ## Train
 
